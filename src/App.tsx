@@ -1,81 +1,78 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Header } from './components/Header';
 import { SimulationPanel } from './components/SimulationPanel';
-import { SlidePanel } from './components/SlidePanel';
-import { Lightbulb, RotateCcw } from 'lucide-react';
-import clsx from 'clsx';
+import { InfographicPanel } from './components/InfographicPanel';
+import type { GeneratedContent } from './types';
+import { generateContent } from './utils/mockApi';
 
 function App() {
-  const [maximizedPanel, setMaximizedPanel] = useState<'left' | 'right' | null>(null);
-  const [showDrawer, setShowDrawer] = useState(true);
+  const [history, setHistory] = useState<GeneratedContent[]>(() => {
+    const saved = localStorage.getItem('physics-sim-history');
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const resetWorkspace = () => {
-    if (confirm('Are you sure you want to reset all slides, drawings, and simulations? This cannot be undone.')) {
-      localStorage.removeItem('physics-slides');
-      localStorage.removeItem('physics-current-slide');
-      localStorage.removeItem('physics-strokes');
-      localStorage.removeItem('physics-simulations');
-      localStorage.removeItem('physics-current-sim');
-      window.location.reload();
+  const [currentContentId, setCurrentContentId] = useState<string | null>(() => {
+    return localStorage.getItem('physics-sim-current') || null;
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [fontSizeMultiplier, setFontSizeMultiplier] = useState(1);
+
+  // Sync to local storage
+  useEffect(() => {
+    localStorage.setItem('physics-sim-history', JSON.stringify(history));
+  }, [history]);
+
+  useEffect(() => {
+    if (currentContentId) {
+      localStorage.setItem('physics-sim-current', currentContentId);
+    }
+  }, [currentContentId]);
+
+  const currentContent = history.find(h => h.id === currentContentId) || null;
+
+  const handleGenerate = async (topic: string) => {
+    setIsLoading(true);
+    try {
+      const newContent = await generateContent(topic);
+      setHistory(prev => [newContent, ...prev]);
+      setCurrentContentId(newContent.id);
+    } catch (error) {
+      console.error("Failed to generate content:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen p-4 flex flex-col gap-4">
-      {/* Main Grid Workspace */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 flex-1">
+    <div className="min-h-screen p-4 flex flex-col gap-4 cosmic-bg relative">
+      <Header
+        onGenerate={handleGenerate}
+        isLoading={isLoading}
+        history={history}
+        onSelectHistory={setCurrentContentId}
+        fontSize={fontSizeMultiplier}
+        setFontSize={setFontSizeMultiplier}
+      />
 
-        {/* Left Panel (4/12) */}
-        <div className={clsx(
-          "transition-all duration-300",
-          maximizedPanel === 'left' ? "md:col-span-12" : "md:col-span-4",
-          maximizedPanel === 'right' ? "hidden md:hidden" : "block"
-        )}>
+      {/* Main Grid Workspace - 5/12 Left, 7/12 Right as per prompt */}
+      <div className="flex flex-col md:flex-row gap-4 flex-1 overflow-hidden h-[calc(100vh-8rem)]">
+
+        {/* Left Panel: Simulation (5/12) */}
+        <div className="w-full md:w-5/12 h-full flex flex-col">
           <SimulationPanel
-            isMaximized={maximizedPanel === 'left'}
-            onToggleMaximize={() => setMaximizedPanel(prev => prev === 'left' ? null : 'left')}
+            simulationType={currentContent?.simulationType || 'unknown'}
           />
         </div>
 
-        {/* Right Panel (8/12) */}
-        <div className={clsx(
-          "transition-all duration-300",
-          maximizedPanel === 'right' ? "md:col-span-12" : "md:col-span-8",
-          maximizedPanel === 'left' ? "hidden md:hidden" : "block"
-        )}>
-          <SlidePanel
-             isMaximized={maximizedPanel === 'right'}
-             onToggleMaximize={() => setMaximizedPanel(prev => prev === 'right' ? null : 'right')}
+        {/* Right Panel: Infographic (7/12) */}
+        <div className="w-full md:w-7/12 h-full flex flex-col">
+          <InfographicPanel
+            data={currentContent?.infographic || null}
+            fontSizeMultiplier={fontSizeMultiplier}
           />
         </div>
 
-      </div>
-
-      {/* Teacher Action Bar / Footer */}
-      <div className="glass-panel p-4 flex justify-between items-center bg-black/20 z-50">
-        <div className="flex items-center gap-4">
-           <button
-             onClick={() => setShowDrawer(!showDrawer)}
-             className={clsx("flex items-center gap-2 px-4 py-2 rounded-lg transition-colors border", showDrawer ? "bg-amber-500/20 border-amber-500/30 text-amber-300" : "bg-white/5 border-white/10 text-zinc-400 hover:text-white")}
-           >
-             <Lightbulb size={18} />
-             <span className="font-medium text-sm">Teacher Guide</span>
-           </button>
-
-           {showDrawer && (
-             <div className="text-sm text-zinc-300 flex items-center gap-2">
-               <span className="px-2 py-1 bg-white/10 rounded font-mono text-xs text-amber-400 border border-white/10">Tip:</span>
-               Use visual analogies instead of equations to explain complex concepts first.
-             </div>
-           )}
-        </div>
-
-        <button
-          onClick={resetWorkspace}
-          className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors border border-transparent hover:border-red-400/20"
-        >
-          <RotateCcw size={16} />
-          Reset Workspace
-        </button>
       </div>
     </div>
   );

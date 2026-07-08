@@ -1,24 +1,18 @@
-export interface Slide {
+export interface InfographicData {
+  title: string;
+  keyConcept: string;
+  mainIdea: string;
+  importantFormula?: string;
+  visualExplanation: string;
+  oneLineSummary: string;
+  keyTakeaway: string;
+  doYouKnow?: string;
+  realLifeExample?: string;
+}
+
+export interface GeneratedContent {
   id: string;
-  name: string;
-  imageUrl: string;
-  type: 'preset' | 'upload';
-}
-
-export interface Simulation {
-  id: string;
-  name: string;
-  url: string;
-}
-
-export interface Point {
-  x: number; // Percentage (0-1)
-  y: number; // Percentage (0-1)
-}
-
-export interface Stroke {
-  points: Point[];
-  color: string;
-  width: number;
-  isEraser: boolean;
+  topic: string;
+  simulationType: 'dot-product' | 'pendulum' | 'unknown';
+  infographic: InfographicData;
 }
