@@ -205,8 +205,9 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({ isMaximized, onToggleMax
         </div>
         <button
           onClick={onToggleMaximize}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white"
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none"
           title={isMaximized ? "Minimize" : "Maximize"}
+          aria-label={isMaximized ? "Minimize panel" : "Maximize panel"}
         >
           {isMaximized ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
         </button>
@@ -245,23 +246,28 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({ isMaximized, onToggleMax
         <div className="flex items-center gap-2 bg-slate-900/60 border border-white/10 rounded-lg p-1 ml-auto">
            <button
              onClick={() => setCurrentTool('pen')}
-             className={clsx("p-2 rounded transition-colors", currentTool === 'pen' ? "bg-indigo-600 text-white" : "text-zinc-400 hover:text-white hover:bg-white/10")}
+             className={clsx("p-2 rounded transition-colors focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:outline-none focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900", currentTool === 'pen' ? "bg-indigo-600 text-white" : "text-zinc-400 hover:text-white hover:bg-white/10")}
              title="Red Pen"
+             aria-label="Pen tool"
+             aria-pressed={currentTool === 'pen'}
            >
              <PenTool size={18} />
            </button>
            <button
              onClick={() => setCurrentTool('eraser')}
-             className={clsx("p-2 rounded transition-colors", currentTool === 'eraser' ? "bg-amber-500 text-white" : "text-zinc-400 hover:text-white hover:bg-white/10")}
+             className={clsx("p-2 rounded transition-colors focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:outline-none focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900", currentTool === 'eraser' ? "bg-amber-500 text-white" : "text-zinc-400 hover:text-white hover:bg-white/10")}
              title="Eraser"
+             aria-label="Eraser tool"
+             aria-pressed={currentTool === 'eraser'}
            >
              <Eraser size={18} />
            </button>
            <div className="w-px h-6 bg-white/10 mx-1"></div>
            <button
              onClick={clearCanvas}
-             className="p-2 rounded text-zinc-400 hover:text-red-400 hover:bg-white/10 transition-colors"
+             className="p-2 rounded text-zinc-400 hover:text-red-400 hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
              title="Clear Drawings"
+             aria-label="Clear all drawings"
            >
              <Trash2 size={18} />
            </button>
