@@ -1,0 +1,3 @@
+## 2024-07-08 - Accessible Toolbars
+**Learning:** When building custom toolbars with active states (like a pen vs eraser tool), screen reader users are completely blind to visual active states (like a background color change). `aria-pressed` is crucial to convey which tool is currently engaged.
+**Action:** Always pair visual active states on toggle buttons with `aria-pressed={isActive}` to ensure parity between visual and assistive technology experiences.

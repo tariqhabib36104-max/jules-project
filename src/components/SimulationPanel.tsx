@@ -68,8 +68,9 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({ isMaximized, o
         </div>
         <button
           onClick={onToggleMaximize}
-          className="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white"
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-none"
           title={isMaximized ? "Minimize" : "Maximize"}
+          aria-label={isMaximized ? "Minimize panel" : "Maximize panel"}
         >
           {isMaximized ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
         </button>
@@ -111,7 +112,8 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({ isMaximized, o
           <button
             type="submit"
             disabled={!newName || !newUrl}
-            className="glass-button bg-teal-500/20 hover:bg-teal-500/30 border-teal-500/30 text-teal-300 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="glass-button bg-teal-500/20 hover:bg-teal-500/30 border-teal-500/30 text-teal-300 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-none focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            aria-label="Add custom simulation"
           >
             <Plus size={16} />
           </button>
